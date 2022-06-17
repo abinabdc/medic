@@ -25,6 +25,8 @@ namespace medical_project
 
             services.AddControllers();
             services.AddScoped<ITokenService, TokenService>();
+            services.AddScoped<IRequestBloodRepository, RequestBloodRepository>();
+            services.AddScoped<IUserRepository, UserRepository>();
             services.AddDbContext<DataContext>(options =>
             {
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));

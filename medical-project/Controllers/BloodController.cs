@@ -1,6 +1,9 @@
 ﻿using AutoMapper;
+using medical_project.Dtos;
+using medical_project.Extensions;
 using medical_project.Interfaces;
 using medical_project.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,12 +16,55 @@ namespace medical_project.Controllers
         private readonly DataContext _context;
         private readonly IMapper _mapper;
         private readonly IRequestBloodRepository _bloodRepo;
+        private readonly IUserRepository _userRepo;
         
-        public BloodController(DataContext ctx, IMapper mapper, IRequestBloodRepository bloodRepo)
+        public BloodController(DataContext ctx, IMapper mapper, IRequestBloodRepository bloodRepo, IUserRepository userRepo)
         {
             _context = ctx;
             _mapper = mapper;
             _bloodRepo = bloodRepo;
+            _userRepo = userRepo;
+        }
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<BloodRequestDto>>> GetBloodRequests()
+        {
+            var result = _mapper.Map<BloodRequestDto>(_bloodRepo.GetBloodRequestsWithExpiry(false));
+            return Ok(result);
+        }
+        [HttpPost("req-new")]
+        [Authorize]
+        public async Task<ActionResult> RequestBlood(BloodRequestDto bloodReqDto)
+        {
+            var username = User.GetUsername();
+            var userId = Int32.Parse(username);
+            var userRequesting = await _userRepo.GetUserByIdAsync(userId);
+            if (userRequesting != null)
+            {
+                var bloodrq = new BloodRequest
+                {
+                    BloodGroup = bloodReqDto.BloodGroup,
+                    isExpired = false,
+                    RequiredML = bloodReqDto.RequiredML,
+                    ReceivedML = bloodReqDto.ReceivedML,
+                    ExtraComments = bloodReqDto.ExtraComments,
+                    Location = bloodReqDto.Location,
+                    AppUserId = userId
+                };
+                _context.BloodRequests.Add(bloodrq);
+                if (await _bloodRepo.SaveAllAsync())
+                {
+                    return Ok("Requested Successfully");
+                }
+                else
+                {
+                    return BadRequest("Something went wrong while saving the request");
+                }
+            }
+             return BadRequest("User with userID doesnot exists");
+             
+           
+            
+            
         }
 
 
