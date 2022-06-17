@@ -6,9 +6,9 @@ namespace medical_project.Interfaces
     {
         void Update(AppUser user);
         Task<bool> SaveAllAsync();
-        Task<IEnumerable<AppUserDto>> GetUsersAsync();
-        Task<AppUserDto> GetUserByIdAsync(int id);
-        Task<AppUserDto> GetUserByIdInternalUse(int id);
-        Task<AppUserDto> GetUserByUsernameAsync(string username);
+        Task<IEnumerable<UserDetailDto>> GetUsersAsync();
+        Task<UserDetailDto> GetUserByIdAsync(int id);
+        Task<AppUser> GetUserByIdInternalUse(int id);
+        Task<UserDetailDto> GetUserByUsernameAsync(string username);
     }
 }

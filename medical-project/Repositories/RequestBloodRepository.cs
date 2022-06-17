@@ -1,4 +1,7 @@
-﻿using medical_project.Interfaces;
+﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
+using medical_project.Dtos;
+using medical_project.Interfaces;
 using medical_project.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,9 +10,11 @@ namespace medical_project.Repositories
     public class RequestBloodRepository : IRequestBloodRepository
     {
         private readonly DataContext _context;
-        public RequestBloodRepository(DataContext ctx)
+        private readonly IMapper _mapper;
+        public RequestBloodRepository(DataContext ctx, IMapper mapper)
         {
             _context = ctx;
+            _mapper = mapper;
 
         }
 
@@ -23,9 +28,9 @@ namespace medical_project.Repositories
             return await _context.BloodRequests.ToListAsync();
         }
 
-        public async Task<IEnumerable<BloodRequest>> GetBloodRequestsWithExpiry(bool isExpired)
+        public async Task<IEnumerable<BloodRequestDto>> GetBloodRequestsWithExpiry(bool isExpired)
         {
-            return await _context.BloodRequests.Where(b => b.isExpired == isExpired).ToListAsync();
+            return await _context.BloodRequests.Where(b => b.isExpired == isExpired).ProjectTo<BloodRequestDto>(_mapper.ConfigurationProvider).ToListAsync();
         }
 
         public async Task<IEnumerable<BloodRequest>> GetBloodRequestWithGroup(string bloodType)

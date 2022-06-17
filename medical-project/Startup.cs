@@ -57,6 +57,13 @@ namespace medical_project
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "WebAPIv5", Version = "v1" });
             });
+            services.AddAuthorization(opt =>
+            {
+                opt.AddPolicy("Normal", policy => policy.RequireRole("Normal", "Manager", "Admin"));
+                opt.AddPolicy("Manager", policy => policy.RequireRole("Manager, Admin"));
+                opt.AddPolicy("Admin", policy => policy.RequireRole("Admin"));
+
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -72,6 +79,8 @@ namespace medical_project
             app.UseHttpsRedirection();
 
             app.UseRouting();
+            app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:4200"));
+            app.UseAuthentication();
 
             app.UseAuthorization();
 

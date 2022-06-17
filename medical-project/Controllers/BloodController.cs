@@ -6,6 +6,7 @@ using medical_project.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using AutoMapper.QueryableExtensions;
 
 namespace medical_project.Controllers
 {
@@ -28,11 +29,12 @@ namespace medical_project.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<BloodRequestDto>>> GetBloodRequests()
         {
-            var result = _mapper.Map<BloodRequestDto>(_bloodRepo.GetBloodRequestsWithExpiry(false));
+            var result = await _bloodRepo.GetBloodRequestsWithExpiry(false);
             return Ok(result);
+            /*return Ok(result.ProjectTo<BloodRequestDto>(_mapper.ConfigurationProvider));*/
         }
         [HttpPost("req-new")]
-        [Authorize]
+        [Authorize(Policy = "Normal")]
         public async Task<ActionResult> RequestBlood(BloodRequestDto bloodReqDto)
         {
             var username = User.GetUsername();

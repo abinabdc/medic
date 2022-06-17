@@ -1,4 +1,5 @@
-﻿using medical_project.Models;
+﻿using medical_project.Dtos;
+using medical_project.Models;
 
 namespace medical_project.Interfaces
 {
@@ -9,7 +10,7 @@ namespace medical_project.Interfaces
         Task<IEnumerable<BloodRequest>> GetBloodRequestsAsync();
         Task<BloodRequest> GetBloodRequestById(int id);
         Task<IEnumerable<BloodRequest>> GetBloodRequestWithGroup(string bloodType);
-        Task<IEnumerable<BloodRequest>> GetBloodRequestsWithExpiry(bool isExpired);
+        Task<IEnumerable<BloodRequestDto>> GetBloodRequestsWithExpiry(bool isExpired);
 
     }
 }

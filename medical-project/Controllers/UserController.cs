@@ -34,6 +34,11 @@ namespace medical_project.Controllers
             var users = await _userRepo.GetUsersAsync();
             return Ok(users);
         }
+        [HttpGet("{id}")]
+        public async Task<ActionResult<AppUserDto>> GetUser(int id)
+        {
+            return Ok(await _userRepo.GetUserByIdAsync(id));
+        }
         [HttpGet("my-details")]
         [Authorize]
         public async Task<ActionResult<AppUserDto>> GetDetails()

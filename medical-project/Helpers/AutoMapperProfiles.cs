@@ -9,6 +9,8 @@ namespace medical_project.Helpers
         public AutoMapperProfiles()
         {
             CreateMap<BloodRequest, BloodRequestDto>();
+            CreateMap<AppUser, AppUserDto>();
+            CreateMap<AppUser, UserDetailDto>();
         }
     }
 }

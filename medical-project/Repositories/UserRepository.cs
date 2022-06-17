@@ -17,11 +17,11 @@ namespace medical_project.Repositories
 
         }
 
-        public async Task<AppUserDto> GetUserByIdAsync(int id)
+        public async Task<UserDetailDto> GetUserByIdAsync(int id)
         {
             return await _context.Users
                 .Where(x => x.Id == id)
-                .ProjectTo<AppUserDto>(_mapper.ConfigurationProvider)
+                .ProjectTo<UserDetailDto>(_mapper.ConfigurationProvider)
                 .FirstOrDefaultAsync();
         }
 
@@ -32,18 +32,18 @@ namespace medical_project.Repositories
                 .FirstOrDefaultAsync();
         }
 
-        public async Task<AppUserDto> GetUserByUsernameAsync(string username)
+        public async Task<UserDetailDto> GetUserByUsernameAsync(string username)
         {
             return await _context.Users
                .Where(x => x.UserName == username)
-               .ProjectTo<AppUserDto>(_mapper.ConfigurationProvider)
+               .ProjectTo<UserDetailDto>(_mapper.ConfigurationProvider)
                .SingleOrDefaultAsync();
         }
 
-        public async Task<IEnumerable<AppUserDto>> GetUsersAsync()
+        public async Task<IEnumerable<UserDetailDto>> GetUsersAsync()
         {
             return await _context.Users
-                .ProjectTo<AppUserDto>(_mapper.ConfigurationProvider)
+                .ProjectTo<UserDetailDto>(_mapper.ConfigurationProvider)
                 .ToListAsync();
         }
 
@@ -57,10 +57,6 @@ namespace medical_project.Repositories
             _context.Entry(user).State = EntityState.Modified;
         }
 
-        Task<AppUserDto> IUserRepository.GetUserByIdInternalUse(int id)
-        {
-            throw new NotImplementedException();
-        }
-
+       
     }
 }
