@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using AutoMapper.QueryableExtensions;
+using Microsoft.AspNetCore.Identity;
 
 namespace medical_project.Controllers
 {
@@ -18,13 +19,15 @@ namespace medical_project.Controllers
         private readonly IMapper _mapper;
         private readonly IRequestBloodRepository _bloodRepo;
         private readonly IUserRepository _userRepo;
-        
-        public BloodController(DataContext ctx, IMapper mapper, IRequestBloodRepository bloodRepo, IUserRepository userRepo)
+        private readonly UserManager<AppUser> _userManager;
+
+        public BloodController(UserManager<AppUser> userManager, DataContext ctx, IMapper mapper, IRequestBloodRepository bloodRepo, IUserRepository userRepo)
         {
             _context = ctx;
             _mapper = mapper;
             _bloodRepo = bloodRepo;
             _userRepo = userRepo;
+            _userManager = userManager;
         }
         [HttpGet]
         public async Task<ActionResult<IEnumerable<BloodRequestDto>>> GetBloodRequests()
@@ -62,11 +65,44 @@ namespace medical_project.Controllers
                     return BadRequest("Something went wrong while saving the request");
                 }
             }
-             return BadRequest("User with userID doesnot exists");
-             
-           
+            return BadRequest("User with userID doesnot exists");
+        }
+        [HttpDelete("delete-req")]
+        [Authorize]
+        public async Task<ActionResult> DeleteRequest(DeleteRequestDto deleteRequestDto)
+        {
+            var username = User.GetUsername();
+            var userId = Int32.Parse(username);
+            var userRequesting = await _userRepo.GetUserByIdInternalUse(userId);
+
+            if (userRequesting != null)
+            {
+               if (await IsPasswordCorrect(userRequesting, deleteRequestDto.Password))
+                {
+                    _context.BloodRequests.Remove(await _bloodRepo.GetBloodRequestById(deleteRequestDto.ReqId));
+                    if (await _bloodRepo.SaveAllAsync())
+                    {
+                        return Ok("The Request was deleted successfully");
+                    }
+                }
+                else
+                {
+                    return Ok("The password is not correct");
+                }
+            }
+            return BadRequest("There was no matching user");
+
             
-            
+        }
+
+        private async Task<bool> IsPasswordCorrect(AppUser user, string password)
+        {
+            return await _userManager.CheckPasswordAsync(user, password);
+        }
+        public class DeleteRequestDto
+        {
+            public int ReqId { get; set; }
+            public string Password { get; set; }
         }
 
 
