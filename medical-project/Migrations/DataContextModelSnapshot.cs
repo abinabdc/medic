@@ -193,6 +193,22 @@ namespace medical_project.Migrations
                     b.ToTable("BloodRequests");
                 });
 
+            modelBuilder.Entity("medical_project.Models.UserDonatingBlood", b =>
+                {
+                    b.Property<int>("AppUserId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("BloodRequestId")
+                        .HasColumnType("int");
+
+                    b.HasKey("AppUserId", "BloodRequestId");
+
+                    b.HasIndex("BloodRequestId")
+                        .IsUnique();
+
+                    b.ToTable("UsersDonating");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
                 {
                     b.Property<int>("Id")
@@ -311,6 +327,25 @@ namespace medical_project.Migrations
                     b.Navigation("RequestedBy");
                 });
 
+            modelBuilder.Entity("medical_project.Models.UserDonatingBlood", b =>
+                {
+                    b.HasOne("medical_project.AppUser", "UserDonating")
+                        .WithMany("Donations")
+                        .HasForeignKey("AppUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("medical_project.Models.BloodRequest", "BloodRequestPost")
+                        .WithOne("Donors")
+                        .HasForeignKey("medical_project.Models.UserDonatingBlood", "BloodRequestId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("BloodRequestPost");
+
+                    b.Navigation("UserDonating");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
                 {
                     b.HasOne("medical_project.AppRole", null)
@@ -354,7 +389,15 @@ namespace medical_project.Migrations
 
             modelBuilder.Entity("medical_project.AppUser", b =>
                 {
+                    b.Navigation("Donations");
+
                     b.Navigation("UserRoles");
+                });
+
+            modelBuilder.Entity("medical_project.Models.BloodRequest", b =>
+                {
+                    b.Navigation("Donors")
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

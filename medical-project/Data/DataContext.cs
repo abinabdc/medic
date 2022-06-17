@@ -16,6 +16,7 @@ namespace medical_project
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
+            
             builder.Entity<AppUser>()
                 .HasMany(ur => ur.UserRoles)
                 .WithOne(u => u.User)
@@ -27,9 +28,21 @@ namespace medical_project
                 .WithOne(u => u.Role)
                 .HasForeignKey(u => u.RoleId)
                 .IsRequired();
-           
+
+            builder.Entity<UserDonatingBlood>()
+                .HasKey(u => new
+                {
+                    u.AppUserId,
+                    u.BloodRequestId
+                });
+          
+
+            /* builder.Conventions.Remove<OneToManyCascadeDeleteConvention>();*/
+
+
         }
         public DbSet<BloodRequest> BloodRequests { get; set; }
+        public DbSet<UserDonatingBlood> UsersDonating { get; set; }
 
     }
 }

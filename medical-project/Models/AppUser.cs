@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using medical_project.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace medical_project
 {
@@ -13,5 +14,7 @@ namespace medical_project
 
         //Relationship
         public ICollection<AppUserRole> UserRoles { get; set; }
+
+        public ICollection<UserDonatingBlood> Donations { get; set; }
     }
 }

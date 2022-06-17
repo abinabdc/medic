@@ -13,5 +13,7 @@
         //Relationships
         public int AppUserId { get; set; }
         public AppUser RequestedBy { get; set; }
+
+        public UserDonatingBlood Donors { get; set; }
     }
 }
