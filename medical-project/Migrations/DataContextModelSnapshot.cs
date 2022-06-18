@@ -175,22 +175,18 @@ namespace medical_project.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ReceivedML")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("ReceivedML")
+                        .HasColumnType("int");
 
-                    b.Property<string>("RequiredML")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("RequiredML")
+                        .HasColumnType("int");
 
                     b.Property<bool>("isExpired")
                         .HasColumnType("bit");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AppUserId");
-
-                    b.ToTable("BloodRequests");
+                    b.ToTable("BloodRequest");
                 });
 
             modelBuilder.Entity("medical_project.Models.UserDonatingBlood", b =>
@@ -201,10 +197,12 @@ namespace medical_project.Migrations
                     b.Property<int>("BloodRequestId")
                         .HasColumnType("int");
 
+                    b.Property<int>("MLDonating")
+                        .HasColumnType("int");
+
                     b.HasKey("AppUserId", "BloodRequestId");
 
-                    b.HasIndex("BloodRequestId")
-                        .IsUnique();
+                    b.HasIndex("BloodRequestId");
 
                     b.ToTable("UsersDonating");
                 });
@@ -316,34 +314,23 @@ namespace medical_project.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("medical_project.Models.BloodRequest", b =>
-                {
-                    b.HasOne("medical_project.AppUser", "RequestedBy")
-                        .WithMany()
-                        .HasForeignKey("AppUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("RequestedBy");
-                });
-
             modelBuilder.Entity("medical_project.Models.UserDonatingBlood", b =>
                 {
-                    b.HasOne("medical_project.AppUser", "UserDonating")
-                        .WithMany("Donations")
+                    b.HasOne("medical_project.AppUser", "AppUser")
+                        .WithMany("UserDonatingBlood")
                         .HasForeignKey("AppUserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("medical_project.Models.BloodRequest", "BloodRequestPost")
-                        .WithOne("Donors")
-                        .HasForeignKey("medical_project.Models.UserDonatingBlood", "BloodRequestId")
+                    b.HasOne("medical_project.Models.BloodRequest", "BloodRequest")
+                        .WithMany("UsersDonatingBlood")
+                        .HasForeignKey("BloodRequestId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("BloodRequestPost");
+                    b.Navigation("AppUser");
 
-                    b.Navigation("UserDonating");
+                    b.Navigation("BloodRequest");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
@@ -389,15 +376,14 @@ namespace medical_project.Migrations
 
             modelBuilder.Entity("medical_project.AppUser", b =>
                 {
-                    b.Navigation("Donations");
+                    b.Navigation("UserDonatingBlood");
 
                     b.Navigation("UserRoles");
                 });
 
             modelBuilder.Entity("medical_project.Models.BloodRequest", b =>
                 {
-                    b.Navigation("Donors")
-                        .IsRequired();
+                    b.Navigation("UsersDonatingBlood");
                 });
 #pragma warning restore 612, 618
         }

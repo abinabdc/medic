@@ -28,6 +28,7 @@ namespace medical_project
                 .WithOne(u => u.Role)
                 .HasForeignKey(u => u.RoleId)
                 .IsRequired();
+            /* builder.Entity<BloodRequest>().HasMany(d => d.Donors).*/
 
             builder.Entity<UserDonatingBlood>()
                 .HasKey(u => new
@@ -35,13 +36,20 @@ namespace medical_project
                     u.AppUserId,
                     u.BloodRequestId
                 });
-          
+
+
+
+
+
+
+
+
 
             /* builder.Conventions.Remove<OneToManyCascadeDeleteConvention>();*/
 
 
         }
-        public DbSet<BloodRequest> BloodRequests { get; set; }
+        public DbSet<BloodRequest> BloodRequest { get; set; }
         public DbSet<UserDonatingBlood> UsersDonating { get; set; }
 
     }

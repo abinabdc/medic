@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace medical_project.Migrations
 {
-    public partial class tablesetupasd : Migration
+    public partial class initialsetup : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -53,6 +53,25 @@ namespace medical_project.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "BloodRequest",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    BloodGroup = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    isExpired = table.Column<bool>(type: "bit", nullable: false),
+                    RequiredML = table.Column<int>(type: "int", nullable: false),
+                    ReceivedML = table.Column<int>(type: "int", nullable: false),
+                    ExtraComments = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Location = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    AppUserId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BloodRequest", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -162,36 +181,12 @@ namespace medical_project.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "BloodRequests",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    BloodGroup = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    isExpired = table.Column<bool>(type: "bit", nullable: false),
-                    RequiredML = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ReceivedML = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ExtraComments = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Location = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    AppUserId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_BloodRequests", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_BloodRequests_AspNetUsers_AppUserId",
-                        column: x => x.AppUserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "UsersDonating",
                 columns: table => new
                 {
                     AppUserId = table.Column<int>(type: "int", nullable: false),
-                    BloodRequestId = table.Column<int>(type: "int", nullable: false)
+                    BloodRequestId = table.Column<int>(type: "int", nullable: false),
+                    MLDonating = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -203,11 +198,11 @@ namespace medical_project.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_UsersDonating_BloodRequests_BloodRequestId",
+                        name: "FK_UsersDonating_BloodRequest_BloodRequestId",
                         column: x => x.BloodRequestId,
-                        principalTable: "BloodRequests",
+                        principalTable: "BloodRequest",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
@@ -250,15 +245,9 @@ namespace medical_project.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_BloodRequests_AppUserId",
-                table: "BloodRequests",
-                column: "AppUserId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_UsersDonating_BloodRequestId",
                 table: "UsersDonating",
-                column: "BloodRequestId",
-                unique: true);
+                column: "BloodRequestId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -285,10 +274,10 @@ namespace medical_project.Migrations
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
-                name: "BloodRequests");
+                name: "AspNetUsers");
 
             migrationBuilder.DropTable(
-                name: "AspNetUsers");
+                name: "BloodRequest");
         }
     }
 }

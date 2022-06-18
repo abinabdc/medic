@@ -59,8 +59,8 @@ namespace medical_project
             });
             services.AddAuthorization(opt =>
             {
-                opt.AddPolicy("Normal", policy => policy.RequireRole("Normal", "Manager", "Admin"));
-                opt.AddPolicy("Manager", policy => policy.RequireRole("Manager, Admin"));
+                opt.AddPolicy("Normal", policy => policy.RequireRole("Normal", "Vendor", "Admin"));
+                opt.AddPolicy("Manager", policy => policy.RequireRole("Vendor, Admin"));
                 opt.AddPolicy("Admin", policy => policy.RequireRole("Admin"));
 
             });

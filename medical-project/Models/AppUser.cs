@@ -14,7 +14,6 @@ namespace medical_project
 
         //Relationship
         public ICollection<AppUserRole> UserRoles { get; set; }
-
-        public ICollection<UserDonatingBlood> Donations { get; set; }
+        public ICollection<UserDonatingBlood> UserDonatingBlood { get; set; }
     }
 }

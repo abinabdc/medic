@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using AutoMapper.QueryableExtensions;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace medical_project.Controllers
 {
@@ -53,9 +54,10 @@ namespace medical_project.Controllers
                     ReceivedML = bloodReqDto.ReceivedML,
                     ExtraComments = bloodReqDto.ExtraComments,
                     Location = bloodReqDto.Location,
-                    AppUserId = userId
+                    AppUserId = userId,
+                    
                 };
-                _context.BloodRequests.Add(bloodrq);
+                _context.BloodRequest.Add(bloodrq);
                 if (await _bloodRepo.SaveAllAsync())
                 {
                     return Ok("Requested Successfully");
@@ -79,7 +81,7 @@ namespace medical_project.Controllers
             {
                if (await IsPasswordCorrect(userRequesting, deleteRequestDto.Password))
                 {
-                    _context.BloodRequests.Remove(await _bloodRepo.GetBloodRequestById(deleteRequestDto.ReqId));
+                    _context.BloodRequest.Remove(await _bloodRepo.GetBloodRequestById(deleteRequestDto.ReqId));
                     if (await _bloodRepo.SaveAllAsync())
                     {
                         return Ok("The Request was deleted successfully");
@@ -93,6 +95,50 @@ namespace medical_project.Controllers
             return BadRequest("There was no matching user");
 
             
+        }
+        [HttpPost("donating")]
+        public async Task<ActionResult> Donating(UserDonatingBloodDto donatingDto)
+        {
+            var username = User.GetUsername();
+            var userId = Int32.Parse(username);
+            var BloodPost = await _bloodRepo.GetBloodRequestById(donatingDto.BloodRequestId);
+            if (donatingDto.MLDonating > 470)
+            {
+                return BadRequest("A average human can only donate upto 470ML");
+            }
+            if (BloodPost.RequiredML < BloodPost.ReceivedML + donatingDto.MLDonating)
+            {
+                return BadRequest("Exceeding amount detected");
+            }
+            if (await _bloodRepo.GetBloodRequestById(donatingDto.BloodRequestId) != null)
+            {
+                var going = new UserDonatingBlood
+                {
+                    AppUserId = userId,
+                    /*UserDonating = await _userRepo.GetUserByIdInternalUse(userId),*/
+                    BloodRequestId = donatingDto.BloodRequestId,
+                    /*BloodRequestPost = await _bloodRepo.GetBloodRequestById(reqId),*/
+                    MLDonating = donatingDto.MLDonating,
+                };
+                _context.UsersDonating.Add(going);
+                if (await _context.SaveChangesAsync() > 0)
+                {
+                    
+                    
+                    BloodPost.ReceivedML = BloodPost.ReceivedML + donatingDto.MLDonating;
+                    if (await _context.SaveChangesAsync() > 0)
+                    {
+                        return Ok("Everything went well");
+                    }
+                    else
+                    {
+                        _context.UsersDonating.Remove(going);
+                        return BadRequest("Something went wrongg");
+                    }
+                }
+            }
+            return BadRequest("Nothing worked");
+
         }
 
         private async Task<bool> IsPasswordCorrect(AppUser user, string password)

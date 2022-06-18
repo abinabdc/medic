@@ -20,22 +20,22 @@ namespace medical_project.Repositories
 
         public async Task<BloodRequest> GetBloodRequestById(int id)
         {
-            return await _context.BloodRequests.Where(b => b.Id == id).FirstOrDefaultAsync();
+            return await _context.BloodRequest.Where(b => b.Id == id).FirstOrDefaultAsync();
         }
 
         public async Task<IEnumerable<BloodRequest>> GetBloodRequestsAsync()
         {
-            return await _context.BloodRequests.ToListAsync();
+            return await _context.BloodRequest.ToListAsync();
         }
 
         public async Task<IEnumerable<BloodRequestDto>> GetBloodRequestsWithExpiry(bool isExpired)
         {
-            return await _context.BloodRequests.Where(b => b.isExpired == isExpired).ProjectTo<BloodRequestDto>(_mapper.ConfigurationProvider).ToListAsync();
+            return await _context.BloodRequest.Where(b => b.isExpired == isExpired).ProjectTo<BloodRequestDto>(_mapper.ConfigurationProvider).ToListAsync();
         }
 
         public async Task<IEnumerable<BloodRequest>> GetBloodRequestWithGroup(string bloodType)
         {
-            return await _context.BloodRequests.Where(b => b.BloodGroup == bloodType).ToListAsync();
+            return await _context.BloodRequest.Where(b => b.BloodGroup == bloodType).ToListAsync();
         }
 
         public async Task<bool> SaveAllAsync()
