@@ -11,6 +11,6 @@
 
         //Relationships
         public int PharmacyId { get; set; }
-        public PharmacyDto SoldBy { get; set; }
+        public PharmacyDto? SoldBy { get; set; }
     }
 }
