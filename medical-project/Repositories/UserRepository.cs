@@ -37,7 +37,7 @@ namespace medical_project.Repositories
             return await _context.Users
                .Where(x => x.UserName == username)
                .ProjectTo<UserDetailDto>(_mapper.ConfigurationProvider)
-               .SingleOrDefaultAsync();
+               .FirstOrDefaultAsync();
         }
 
         public async Task<IEnumerable<UserDetailDto>> GetUsersAsync()

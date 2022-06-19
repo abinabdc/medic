@@ -19,7 +19,6 @@ namespace medical_project.Repositories
             _key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["TokenKey"]));
 
         }
-
         public async Task<string> CreateToken(AppUser user)
         {
             var claims = new List<Claim>

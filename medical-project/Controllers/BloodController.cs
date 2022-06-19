@@ -31,11 +31,19 @@ namespace medical_project.Controllers
             _userManager = userManager;
         }
         [HttpGet]
+        [Authorize]
         public async Task<ActionResult<IEnumerable<BloodRequestDto>>> GetBloodRequests()
         {
             var result = await _bloodRepo.GetBloodRequestsWithExpiry(false);
             return Ok(result);
             /*return Ok(result.ProjectTo<BloodRequestDto>(_mapper.ConfigurationProvider));*/
+        }
+        [HttpGet("{id}")]
+        [Authorize]
+        public async Task<ActionResult<BloodRequestDto>> GetBloodRequestById(int id)
+        {
+            var result = await _bloodRepo.GetBloodRequestById(id);
+            return Ok(result);
         }
         [HttpPost("req-new")]
         [Authorize(Policy = "Normal")]

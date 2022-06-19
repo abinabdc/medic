@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using medical_project;
 
@@ -11,9 +12,10 @@ using medical_project;
 namespace medical_project.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20220619055945_added pharmacy")]
+    partial class addedpharmacy
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -218,8 +220,7 @@ namespace medical_project.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AppUserId")
-                        .IsUnique();
+                    b.HasIndex("AppUserId");
 
                     b.ToTable("Pharmacy");
                 });
@@ -352,8 +353,8 @@ namespace medical_project.Migrations
             modelBuilder.Entity("medical_project.Models.Pharmacy", b =>
                 {
                     b.HasOne("medical_project.AppUser", "Owner")
-                        .WithOne("Pharmacy")
-                        .HasForeignKey("medical_project.Models.Pharmacy", "AppUserId")
+                        .WithMany()
+                        .HasForeignKey("AppUserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -422,9 +423,6 @@ namespace medical_project.Migrations
 
             modelBuilder.Entity("medical_project.AppUser", b =>
                 {
-                    b.Navigation("Pharmacy")
-                        .IsRequired();
-
                     b.Navigation("UserDonatingBlood");
 
                     b.Navigation("UserRoles");
