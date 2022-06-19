@@ -52,6 +52,7 @@ namespace medical_project
         public DbSet<BloodRequest> BloodRequest { get; set; }
         public DbSet<UserDonatingBlood> UsersDonating { get; set; }
         public DbSet<Pharmacy> Pharmacy { get; set; }
+        public DbSet<Product> Product { get; set; }
 
     }
 }

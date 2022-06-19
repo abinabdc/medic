@@ -10,6 +10,7 @@
 
         public int AppUserId { get; set; }
         public AppUser Owner { get; set; }
+        public ICollection<Product> Products { get; set; }
 
     }
 }
