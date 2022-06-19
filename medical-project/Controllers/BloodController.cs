@@ -102,6 +102,14 @@ namespace medical_project.Controllers
             var username = User.GetUsername();
             var userId = Int32.Parse(username);
             var BloodPost = await _bloodRepo.GetBloodRequestById(donatingDto.BloodRequestId);
+            if (BloodPost == null)
+            {
+                return BadRequest("Invalid blood request");
+            }
+            if (await _bloodRepo.UsersAlreadyGoing(userId, donatingDto.BloodRequestId))
+            {
+                return BadRequest("The User is already going");
+            }
             if (donatingDto.MLDonating > 470)
             {
                 return BadRequest("A average human can only donate upto 470ML");
@@ -140,6 +148,65 @@ namespace medical_project.Controllers
             return BadRequest("Nothing worked");
 
         }
+        [HttpPut("donating")]
+        public async Task<IActionResult> EditDonatingAmount(UserDonatingBloodDto donatingDto)
+        {
+            var username = User.GetUsername();
+            var userId = Int32.Parse(username);
+            var BloodPost = await _bloodRepo.GetBloodRequestById(donatingDto.BloodRequestId);
+            var RequestBeingEdited = await _bloodRepo.UserDonatingBlood(userId, donatingDto.BloodRequestId);
+            if (BloodPost == null)
+            {
+                return BadRequest("Invalid blood request");
+            }
+            if (!await _bloodRepo.UsersAlreadyGoing(userId, donatingDto.BloodRequestId))
+            {
+                return BadRequest("The User is not going");
+            }
+            if (donatingDto.MLDonating > 470)
+            {
+                return BadRequest("A average human can only donate upto 470ML");
+            }
+            if (BloodPost.RequiredML < BloodPost.ReceivedML + donatingDto.MLDonating)
+            {
+                return BadRequest("Exceeding amount detected");
+            }
+
+            RequestBeingEdited.MLDonating = donatingDto.MLDonating;
+            if (await _bloodRepo.SaveAllAsync())
+            {
+                return Ok("Edited Sucessfully");
+            }
+            return BadRequest("Something went wrong");
+        }
+        [HttpDelete("donating/{id}")]
+        public async Task<IActionResult> UndoDonation(int id)
+        {
+            var username = User.GetUsername();
+            var userId = Int32.Parse(username);
+            var BloodPost = await _bloodRepo.GetBloodRequestById(id);
+            var RequestBeingEdited = await _bloodRepo.UserDonatingBlood(userId, id);
+
+            if (BloodPost == null)
+            {
+               return NotFound("Request Not Found");
+            }
+            if (RequestBeingEdited == null)
+            {
+                return BadRequest("You are not donating.");
+            }
+            _context.UsersDonating.Remove(RequestBeingEdited);
+            if (await _bloodRepo.SaveAllAsync())
+            {
+                return BadRequest("You are not donating anymore.");
+            }
+            return BadRequest("Something went wrong while processing you request");
+            
+
+
+        }
+
+
 
         private async Task<bool> IsPasswordCorrect(AppUser user, string password)
         {

@@ -1,4 +1,6 @@
-﻿namespace medical_project.Dtos
+﻿using medical_project.Models;
+
+namespace medical_project.Dtos
 {
     public class BloodRequestDto
     {
@@ -10,5 +12,6 @@
         public string ExtraComments { get; set; }
         public string Location { get; set; }
         public int AppUserId { get; set; }
+        public ICollection<UserDonatingBloodDto>? UsersDonatingBlood { get; set; }
     }
 }

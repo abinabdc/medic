@@ -15,6 +15,7 @@ namespace medical_project.Models
         public BloodRequest BloodRequest { get; set; }
 
 
+
         public int MLDonating { get; set; }
     }
 }

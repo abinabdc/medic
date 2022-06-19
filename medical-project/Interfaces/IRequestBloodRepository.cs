@@ -9,6 +9,8 @@ namespace medical_project.Interfaces
         Task<bool> SaveAllAsync();
         Task<IEnumerable<BloodRequest>> GetBloodRequestsAsync();
         Task<BloodRequest> GetBloodRequestById(int id);
+        Task<bool> UsersAlreadyGoing(int AppUserid, int bloodreqID);
+        Task<UserDonatingBlood> UserDonatingBlood(int AppUserid, int bloodreqID);
         Task<IEnumerable<BloodRequest>> GetBloodRequestWithGroup(string bloodType);
         Task<IEnumerable<BloodRequestDto>> GetBloodRequestsWithExpiry(bool isExpired);
 

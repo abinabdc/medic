@@ -37,6 +37,14 @@ namespace medical_project.Repositories
         {
             return await _context.BloodRequest.Where(b => b.BloodGroup == bloodType).ToListAsync();
         }
+        public async Task<bool> UsersAlreadyGoing(int AppUserid, int bloodreqID)
+        {
+            return await _context.UsersDonating.AnyAsync(x => x.AppUserId == AppUserid && x.BloodRequestId == bloodreqID );
+        }
+        public async Task<UserDonatingBlood> UserDonatingBlood(int AppUserid, int bloodreqID)
+        {
+            return await _context.UsersDonating.Where(x => x.AppUserId == AppUserid && x.BloodRequestId == bloodreqID).FirstOrDefaultAsync();
+        }
 
         public async Task<bool> SaveAllAsync()
         {
@@ -47,5 +55,7 @@ namespace medical_project.Repositories
         {
             _context.Entry(bloodRequest).State = EntityState.Modified;
         }
+
+       
     }
 }
