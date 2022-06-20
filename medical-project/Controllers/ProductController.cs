@@ -3,6 +3,7 @@ using medical_project.Dtos;
 using medical_project.Extensions;
 using medical_project.Interfaces;
 using medical_project.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -30,9 +31,18 @@ namespace medical_project.Controllers
             _pharmacyRepo = pharmacyRepo;
         }
         [HttpGet("my-products")]
-        public async Task<ActionResult<IEnumerable<ProductDto>>> GetMyProducts(PharmacyIdDto dto)
+        [Authorize]
+        public async Task<ActionResult<IEnumerable<ProductDto>>> GetMyProducts()
         {
-            var result = await _productRepository.GetProductByStoreId(dto.PharmacyId);
+            var username = User.GetUsername();
+            var userId = Int32.Parse(username);
+            var userPharmacy = await _pharmacyRepo.GetPharmacyByUserId(userId);
+            if (userPharmacy == null)
+            {
+                var msg = new { Message = "Pharmacy doesnot exists" };
+                return BadRequest(msg);
+            }
+            var result = await _productRepository.GetProductByStoreId(userPharmacy.Id);
             return Ok(result);
         }
         [HttpGet]
@@ -47,7 +57,7 @@ namespace medical_project.Controllers
             var username = User.GetUsername();
             var userId = Int32.Parse(username);
 
-            var userPharmacy = _pharmacyRepo.GetPharmacyByUserId(userId);
+            var userPharmacy = await _pharmacyRepo.GetPharmacyByUserId(userId);
             if (userPharmacy == null)
             {
                 var msg = new { Message = "User doesnot have registered his pharmacy" };
@@ -73,8 +83,8 @@ namespace medical_project.Controllers
                 await _context.Product.AddAsync(newProduct);
                 if (await _productRepository.SaveAllAsync())
                 {
-                    var msgg = new { Message = "Product has been posted successfully" };
-                    return BadRequest(msgg);
+                    /*var msgg = new { Message = "Product has been posted successfully" };*/
+                    return Ok();
 
                 }
                 else
@@ -85,10 +95,7 @@ namespace medical_project.Controllers
             }
 
         }
-        public class PharmacyIdDto
-        {
-            public int PharmacyId;
-        }
+        
 
     }
 }
