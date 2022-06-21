@@ -16,6 +16,7 @@ namespace medical_project.Controllers
         private readonly IPharmacyRepository _pharmacyRepository;
         private readonly UserManager<AppUser> _userManager;
         private readonly IUserRepository _userRepo;
+        
 
         public PharmacyController(IUserRepository userRepo, UserManager<AppUser> userManager, DataContext ctx, IPharmacyRepository pharmacyRepository)
         {
