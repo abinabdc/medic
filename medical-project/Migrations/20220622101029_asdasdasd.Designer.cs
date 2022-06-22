@@ -12,8 +12,8 @@ using medical_project;
 namespace medical_project.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20220622040220_relationship changes")]
-    partial class relationshipchanges
+    [Migration("20220622101029_asdasdasd")]
+    partial class asdasdasd
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -193,7 +193,28 @@ namespace medical_project.Migrations
 
             modelBuilder.Entity("medical_project.Models.Order", b =>
                 {
+                    b.Property<int>("OrderId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("OrderId"), 1L, 1);
+
                     b.Property<int>("AppUserId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TotalPrice")
+                        .HasColumnType("int");
+
+                    b.HasKey("OrderId");
+
+                    b.HasIndex("AppUserId");
+
+                    b.ToTable("Order");
+                });
+
+            modelBuilder.Entity("medical_project.Models.OrderProducts", b =>
+                {
+                    b.Property<int>("OrderId")
                         .HasColumnType("int");
 
                     b.Property<int>("ProductId")
@@ -214,14 +235,11 @@ namespace medical_project.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("TotalPrice")
-                        .HasColumnType("int");
-
-                    b.HasKey("AppUserId", "ProductId");
+                    b.HasKey("OrderId", "ProductId");
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("Order");
+                    b.ToTable("OrderProducts");
                 });
 
             modelBuilder.Entity("medical_project.Models.Pharmacy", b =>
@@ -423,21 +441,26 @@ namespace medical_project.Migrations
 
             modelBuilder.Entity("medical_project.Models.Order", b =>
                 {
-                    b.HasOne("medical_project.AppUser", "AppUser")
+                    b.HasOne("medical_project.AppUser", null)
                         .WithMany("Order")
                         .HasForeignKey("AppUserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
 
-                    b.HasOne("medical_project.Models.Product", "Product")
+            modelBuilder.Entity("medical_project.Models.OrderProducts", b =>
+                {
+                    b.HasOne("medical_project.Models.Order", null)
+                        .WithMany("productsInOrder")
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("medical_project.Models.Product", null)
                         .WithMany("Orders")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("AppUser");
-
-                    b.Navigation("Product");
                 });
 
             modelBuilder.Entity("medical_project.Models.Pharmacy", b =>
@@ -537,6 +560,11 @@ namespace medical_project.Migrations
             modelBuilder.Entity("medical_project.Models.BloodRequest", b =>
                 {
                     b.Navigation("UsersDonatingBlood");
+                });
+
+            modelBuilder.Entity("medical_project.Models.Order", b =>
+                {
+                    b.Navigation("productsInOrder");
                 });
 
             modelBuilder.Entity("medical_project.Models.Pharmacy", b =>

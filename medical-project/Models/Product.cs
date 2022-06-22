@@ -14,6 +14,6 @@ namespace medical_project.Models
         //Relationships
         public int PharmacyId { get; set; }
         public Pharmacy SoldBy { get; set; }
-        public ICollection<Order> Orders { get; set; }
+        public ICollection<OrderProducts> Orders { get; set; }
     }
 }

@@ -11,6 +11,7 @@
         public string? Status { get; set; } //processing, on the way, delivered
         public string PaymentType { get; set; } // Cash on delivery
         public string? PaymentStatus { get; set; } // Due, Paid
+        public DateTime OrderedDate { get; set; }
 
 
     }

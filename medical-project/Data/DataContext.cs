@@ -36,20 +36,13 @@ namespace medical_project
                     u.AppUserId,
                     u.BloodRequestId
                 });
-            builder.Entity<Order>()
+            builder.Entity<OrderProducts>()
                 .HasKey(u => new
                 {
-                    u.AppUserId,
-                    u.ProductId
+                    u.OrderId,
+                    u.ProductId,
                 });
-            builder.Entity<Order>()
-                .HasOne<AppUser>(a => a.AppUser)
-                .WithMany(s => s.Order)
-                .HasForeignKey(k => k.AppUserId);
-            builder.Entity<Order>()
-                .HasOne<Product>(a => a.Product)
-                .WithMany(s => s.Orders)
-                .HasForeignKey(k => k.ProductId);
+
 
 
 
@@ -70,5 +63,6 @@ namespace medical_project
         public DbSet<Pharmacy> Pharmacy { get; set; }
         public DbSet<Product> Product { get; set; }
         public DbSet<Order> Order { get; set; }
+        public DbSet<OrderProducts> OrderProducts { get; set; } 
     }
 }

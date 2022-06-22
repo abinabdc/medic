@@ -27,42 +27,43 @@ namespace medical_project.Controllers
             _pharmacyRepo = pharmacyRepo;
             _productRepo = productRepo;
         }
+        
         [HttpPost]
         [Authorize]
-        public async Task<ActionResult> PostOrder(OrderDto dto)
+        public async Task<ActionResult> PostOrder(SomeDto dto)
         {
             var username = User.GetUsername();
             var userId = Int32.Parse(username);
-            var product = await _productRepo.GetAllProductByIdAsync(dto.ProductId);
-            if (product == null)
-            {
-                var msg = new { Message = "No product found" };
-                return BadRequest(msg);
-            }
-            var newOrder = new Order
+            var finalOrder = new Order
             {
                 AppUserId = userId,
-                ProductId = dto.ProductId,
-                Quantity = dto.Quantity,
-                TotalPrice = dto.TotalPrice,
-                Status = "Processing",
-                PaymentType = dto.PaymentType,
-                PaymentStatus = "Not Paid"
+                TotalPrice = dto.TotalPrice
             };
-           await _context.Order.AddAsync(newOrder);
-            if (await _orderRepo.SaveAllAsync())
+            await _context.Order.AddAsync(finalOrder);
+            if (await _context.SaveChangesAsync() > 0)
             {
-                var alr = new { Message = "Order Placed Successfully" };
-                return Ok(alr);
+                var something = new OrderProducts
+                {
+                    OrderId = finalOrder.OrderId,
+                    ProductId = dto.ProductId,
+                    PaymentStatus = "Not Paid",
+                    PaymentType = "Cash on Delivery",
+                    Status = "Processing",
+                    Quantity = dto.Quantity
+                };
+                await _context.OrderProducts.AddAsync(something);
+                if (await _context.SaveChangesAsync() > 0)
+                {
+                    return Ok("Everything went well");
+                }
+                return BadRequest("Something went wrong");
+                
             }
             return BadRequest("Something went wrong");
-            
-            
-
 
         }
 
-        [HttpGet]
+        /*[HttpGet]
         [Authorize(Policy = "Admin")]
         public async Task<ActionResult<IEnumerable<OrderDto>>> GetAllOrders()
         {
@@ -157,7 +158,7 @@ namespace medical_project.Controllers
             var orders = await _orderRepo.GetPendingByUserId(userId);
             return Ok(orders);
         }
-
+*/
 
 
 

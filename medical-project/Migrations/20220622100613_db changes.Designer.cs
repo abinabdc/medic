@@ -12,8 +12,8 @@ using medical_project;
 namespace medical_project.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20220619055945_added pharmacy")]
-    partial class addedpharmacy
+    [Migration("20220622100613_db changes")]
+    partial class dbchanges
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -191,6 +191,57 @@ namespace medical_project.Migrations
                     b.ToTable("BloodRequest");
                 });
 
+            modelBuilder.Entity("medical_project.Models.Order", b =>
+                {
+                    b.Property<int>("OrderId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("OrderId"), 1L, 1);
+
+                    b.Property<int>("AppUserId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TotalPrice")
+                        .HasColumnType("int");
+
+                    b.HasKey("OrderId");
+
+                    b.HasIndex("AppUserId");
+
+                    b.ToTable("Order");
+                });
+
+            modelBuilder.Entity("medical_project.Models.OrderProducts", b =>
+                {
+                    b.Property<int>("OrderId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PaymentStatus")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PaymentType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("OrderId", "ProductId");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("OrderProducts");
+                });
+
             modelBuilder.Entity("medical_project.Models.Pharmacy", b =>
                 {
                     b.Property<int>("Id")
@@ -220,9 +271,47 @@ namespace medical_project.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AppUserId");
+                    b.HasIndex("AppUserId")
+                        .IsUnique();
 
                     b.ToTable("Pharmacy");
+                });
+
+            modelBuilder.Entity("medical_project.Models.Product", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("ApplicableFor")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Dose")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("PharmacyId")
+                        .HasColumnType("int");
+
+                    b.Property<float>("Price")
+                        .HasColumnType("real");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PharmacyId");
+
+                    b.ToTable("Product");
                 });
 
             modelBuilder.Entity("medical_project.Models.UserDonatingBlood", b =>
@@ -350,15 +439,50 @@ namespace medical_project.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("medical_project.Models.Order", b =>
+                {
+                    b.HasOne("medical_project.AppUser", null)
+                        .WithMany("Order")
+                        .HasForeignKey("AppUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("medical_project.Models.OrderProducts", b =>
+                {
+                    b.HasOne("medical_project.Models.Order", null)
+                        .WithMany("productsInOrder")
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("medical_project.Models.Product", null)
+                        .WithMany("Orders")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("medical_project.Models.Pharmacy", b =>
                 {
                     b.HasOne("medical_project.AppUser", "Owner")
-                        .WithMany()
-                        .HasForeignKey("AppUserId")
+                        .WithOne("Pharmacy")
+                        .HasForeignKey("medical_project.Models.Pharmacy", "AppUserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Owner");
+                });
+
+            modelBuilder.Entity("medical_project.Models.Product", b =>
+                {
+                    b.HasOne("medical_project.Models.Pharmacy", "SoldBy")
+                        .WithMany("Products")
+                        .HasForeignKey("PharmacyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("SoldBy");
                 });
 
             modelBuilder.Entity("medical_project.Models.UserDonatingBlood", b =>
@@ -423,6 +547,11 @@ namespace medical_project.Migrations
 
             modelBuilder.Entity("medical_project.AppUser", b =>
                 {
+                    b.Navigation("Order");
+
+                    b.Navigation("Pharmacy")
+                        .IsRequired();
+
                     b.Navigation("UserDonatingBlood");
 
                     b.Navigation("UserRoles");
@@ -431,6 +560,21 @@ namespace medical_project.Migrations
             modelBuilder.Entity("medical_project.Models.BloodRequest", b =>
                 {
                     b.Navigation("UsersDonatingBlood");
+                });
+
+            modelBuilder.Entity("medical_project.Models.Order", b =>
+                {
+                    b.Navigation("productsInOrder");
+                });
+
+            modelBuilder.Entity("medical_project.Models.Pharmacy", b =>
+                {
+                    b.Navigation("Products");
+                });
+
+            modelBuilder.Entity("medical_project.Models.Product", b =>
+                {
+                    b.Navigation("Orders");
                 });
 #pragma warning restore 612, 618
         }

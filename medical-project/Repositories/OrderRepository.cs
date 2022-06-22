@@ -17,23 +17,23 @@ namespace medical_project.Repositories
             _mapper = mapper;
 
         }
-        public async Task<IEnumerable<OrderDto>> GetAllAsync()
+        /*public async Task<IEnumerable<OrderDto>> GetAllAsync()
         {
             return await _context.Order.ProjectTo<OrderDto>(_mapper.ConfigurationProvider).ToListAsync();
-        }
+        }*/
 
-        public async Task<IEnumerable<OrderDto>> GetAllByPharmacyIdAsync(int Id)
+/*        public async Task<IEnumerable<OrderDto>> GetAllByPharmacyIdAsync(int Id)
         {
             return await _context.Order.Include(o => o.Product).Where(p => p.Product.PharmacyId == Id).ProjectTo<OrderDto>(_mapper.ConfigurationProvider).ToListAsync();
-            /*return await _context.Order.Include(o => o.Product).Where(p => p.Product.PharmacyId == Id).ProjectTo<OrderDto>(_mapper.ConfigurationProvider).ToListAsync();*/
-        }
+            *//*return await _context.Order.Include(o => o.Product).Where(p => p.Product.PharmacyId == Id).ProjectTo<OrderDto>(_mapper.ConfigurationProvider).ToListAsync();*//*
+        }*/
 
-        public async Task<IEnumerable<OrderDto>> GetAllByUserId(int Id)
+       /* public async Task<IEnumerable<OrderDto>> GetAllByUserId(int Id)
         {
             return await _context.Order.Where(p => p.AppUserId == Id).ProjectTo<OrderDto>(_mapper.ConfigurationProvider).ToListAsync();
-        }
+        }*/
 
-        public async Task<IEnumerable<OrderDto>> GetCompletedByPharmacy(int Id)
+/*        public async Task<IEnumerable<OrderDto>> GetCompletedByPharmacy(int Id)
         {
             return await _context.Order.Include(o => o.Product).Where(p => p.Product.PharmacyId == Id && p.Status == "Delivered").ProjectTo<OrderDto>(_mapper.ConfigurationProvider).ToListAsync();
         }
@@ -51,7 +51,7 @@ namespace medical_project.Repositories
         public async Task<IEnumerable<OrderDto>> GetPendingByUserId(int userId)
         {
             return await _context.Order.Include(o => o.Product).Where(p => p.AppUserId == userId && p.Status != "Delivered").ProjectTo<OrderDto>(_mapper.ConfigurationProvider).ToListAsync();
-        }
+        }*/
 
         public async Task<bool> SaveAllAsync()
         {
