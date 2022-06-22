@@ -42,6 +42,15 @@ namespace medical_project
                     u.AppUserId,
                     u.ProductId
                 });
+            builder.Entity<Order>()
+                .HasOne<AppUser>(a => a.AppUser)
+                .WithMany(s => s.Order)
+                .HasForeignKey(k => k.AppUserId);
+            builder.Entity<Order>()
+                .HasOne<Product>(a => a.Product)
+                .WithMany(s => s.Orders)
+                .HasForeignKey(k => k.ProductId);
+
 
 
 

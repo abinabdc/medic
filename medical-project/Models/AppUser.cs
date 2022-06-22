@@ -1,4 +1,5 @@
-﻿using medical_project.Models;
+﻿using medical_project.Dtos;
+using medical_project.Models;
 using Microsoft.AspNetCore.Identity;
 
 namespace medical_project
@@ -13,7 +14,7 @@ namespace medical_project
 
 
         //Relationship
-        public ICollection<OrderDto> Order { get; set; }
+        public ICollection<Order> Order { get; set; }
         public ICollection<AppUserRole> UserRoles { get; set; }
         public ICollection<UserDonatingBlood> UserDonatingBlood { get; set; }
         public Pharmacy Pharmacy { get; set; }

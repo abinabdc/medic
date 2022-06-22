@@ -1,4 +1,6 @@
-﻿namespace medical_project.Models
+﻿using medical_project.Dtos;
+
+namespace medical_project.Models
 {
     public class Product
     {
@@ -12,6 +14,6 @@
         //Relationships
         public int PharmacyId { get; set; }
         public Pharmacy SoldBy { get; set; }
-        public ICollection<OrderDto> Orders { get; set; }
+        public ICollection<Order> Orders { get; set; }
     }
 }
