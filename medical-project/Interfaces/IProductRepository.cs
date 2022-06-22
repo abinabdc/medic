@@ -10,7 +10,6 @@ namespace medical_project.Interfaces
         Task<IEnumerable<ProductDto>> GetAllProductAsync();
         Task<ProductDto> GetAllProductByIdAsync(int Id);
         Task<IEnumerable<ProductDto>> GetProductByStoreId(int Id);
-
         Task<bool> ProductExists(string name);
 
     }

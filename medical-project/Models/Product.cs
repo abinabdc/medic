@@ -12,6 +12,6 @@
         //Relationships
         public int PharmacyId { get; set; }
         public Pharmacy SoldBy { get; set; }
-        public ICollection<Order> Orders { get; set; }
+        public ICollection<OrderDto> Orders { get; set; }
     }
 }

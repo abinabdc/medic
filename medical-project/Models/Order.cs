@@ -9,8 +9,8 @@
 
         public int Quantity { get; set; }
         public int TotalPrice { get; set; }
-        public int Status { get; set; } //processing, on the way, delivered
+        public string Status { get; set; } //processing, on the way, delivered
         public int PaymentType { get; set; } // Cash on delivery
-        public int PaymentStatus { get; set; } // Due, Paid
+        public string PaymentStatus { get; set; } // Due, Paid
     }
 }

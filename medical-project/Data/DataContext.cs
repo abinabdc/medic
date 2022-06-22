@@ -36,6 +36,13 @@ namespace medical_project
                     u.AppUserId,
                     u.BloodRequestId
                 });
+            builder.Entity<Order>()
+                .HasKey(u => new
+                {
+                    u.AppUserId,
+                    u.ProductId
+                });
+
 
 
 
@@ -53,6 +60,6 @@ namespace medical_project
         public DbSet<UserDonatingBlood> UsersDonating { get; set; }
         public DbSet<Pharmacy> Pharmacy { get; set; }
         public DbSet<Product> Product { get; set; }
-
+        public DbSet<Order> Order { get; set; }
     }
 }
