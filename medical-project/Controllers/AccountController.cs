@@ -1,4 +1,5 @@
 ﻿using medical_project.Dtos;
+using medical_project.Extensions;
 using medical_project.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -28,8 +29,8 @@ namespace medical_project.Controllers
         [HttpPost("register")]
         public async Task<ActionResult<LoginDto>> Register(AppUserDto appUser)
         {
-            if (await UserExists(appUser.UserName)) return BadRequest("User Already Exists");
-            if (await EmailExits(appUser.Email)) return BadRequest("User with this Email Already Exists");
+            if (await UserExists(appUser.UserName)) return BadRequest(CustomResponse.CustResponse($"Username with {appUser.UserName} already exists", false));
+            if (await EmailExits(appUser.Email)) return BadRequest(CustomResponse.CustResponse($"Username with {appUser.Email} already exists", false));
             var user = new AppUser
             {
                 UserName = appUser.UserName.ToLower(),
@@ -45,12 +46,13 @@ namespace medical_project.Controllers
             if (!result.Succeeded) return BadRequest(result.Errors);
             var roleResult = await _userManager.AddToRoleAsync(user, "Normal");
             if (!roleResult.Succeeded) return BadRequest(roleResult.Errors);
-            return new LoginDto
+            var finalResult = new LoginDto
             {
                 Username = user.UserName,
                 Token = await _tokenService.CreateToken(user),
                 Roles = user.UserRoles.Select(r => r.Role.Name).ToList()
             };
+            return Ok(CustomResponse.CustResponse(finalResult, true));
 
         }
         [HttpPost("login")]
@@ -58,21 +60,22 @@ namespace medical_project.Controllers
         {
 
             var user = await _userManager.Users.Include(r => r.UserRoles).ThenInclude(r => r.Role).OrderBy(u => u.UserName).SingleOrDefaultAsync(x => x.UserName == loginDetails.Username.ToLower());
-            if (user == null) return NotFound($"User with {loginDetails.Username} username doesnot exists.");
+            if (user == null) return NotFound(CustomResponse.CustResponse($"User with {loginDetails.Username} username doesnot exists.", false));
 
             var result = await _signInManager.CheckPasswordSignInAsync(user, loginDetails.Password, false);
-            if (!result.Succeeded) return Unauthorized();
+            if (!result.Succeeded) return Unauthorized(CustomResponse.CustResponse("Username or Password didn't match", false));
 
-            return new LoginDto
+            var finalResult = new LoginDto
             {
                 Username = user.UserName,
                 Token = await _tokenService.CreateToken(user),
                 Roles = user.UserRoles.Select(r => r.Role.Name).ToList()
             };
+            return Ok(CustomResponse.CustResponse(finalResult, true));
 
 
 
-     
+
         }
         
         private async Task<bool> UserExists(string username)

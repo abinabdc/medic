@@ -32,12 +32,13 @@ namespace medical_project.Controllers
         public async Task<ActionResult<IEnumerable<AppUserDto>>> GetUsers()
         {
             var users = await _userRepo.GetUsersAsync();
-            return Ok(users);
+            return Ok(CustomResponse.CustResponse(users, true));
         }
         [HttpGet("{id}")]
         public async Task<ActionResult<AppUserDto>> GetUser(int id)
         {
-            return Ok(await _userRepo.GetUserByIdAsync(id));
+            var result = await _userRepo.GetUserByIdAsync(id);
+            return Ok(CustomResponse.CustResponse(result, true));
         }
         [HttpGet("my-details")]
         [Authorize]
@@ -45,7 +46,9 @@ namespace medical_project.Controllers
         {
             var username = User.GetUsername();
             var userId = Int32.Parse(username);
-            return Ok(await _userRepo.GetUserByIdAsync(userId));
+            var result = await _userRepo.GetUserByIdAsync(userId);
+            
+            return Ok(CustomResponse.CustResponse(result, true));
         }
     }
 }

@@ -30,7 +30,7 @@ namespace medical_project.Controllers
         public async Task<ActionResult<IEnumerable<PharmacyDto>>> GetPharmacies()
         {
             var result = await _pharmacyRepository.GetPharmaciesAsync();
-            return Ok(result);
+            return Ok(CustomResponse.CustResponse(result, true));
         }
         [HttpGet("my-pharmacy")]
         public async Task<ActionResult<PharmacyDto>> GetMyPharmacy()
@@ -41,12 +41,11 @@ namespace medical_project.Controllers
             var result = await _pharmacyRepository.GetPharmacyByUserId(userId);
             if (result == null)
             {
-                var err = new { Message = "The user has no Pharmacy registered." };
-                return BadRequest(err);
+                return BadRequest(CustomResponse.CustResponse("The user has no Pharmacy registered.", false));
             }
             else
             {
-                return Ok(result);
+                return Ok(CustomResponse.CustResponse(result, true));
             }
 
         }
@@ -58,8 +57,7 @@ namespace medical_project.Controllers
 
             if (await _pharmacyRepository.PharmacyExists(userId))
             {
-                var err = new { Message = "User has already one existing pharmacy" };
-                return BadRequest(err);
+                return BadRequest(CustomResponse.CustResponse("User has already one existing pharmacy.", false));
             }
             var newPharmacy = new Pharmacy
             {
@@ -76,18 +74,16 @@ namespace medical_project.Controllers
                 var roleResult = await _userManager.AddToRoleAsync(user, "Vendor");
                 if (roleResult.Succeeded)
                 {
-                    var msg = new { Message = "New Pharmacy has been Created Successfully." };
-                    return Ok(msg);
+                    return Ok(CustomResponse.CustResponse("New Pharmacy has been created sucessfully", true));
+                    
 
                 }
                 else
                 {
-                    var msg = new { Message = "Something went wrong while assigning the vendor role." };
-                    return BadRequest(msg);
+                   return BadRequest(CustomResponse.CustResponse("Something went wrong while assigning the vendor role.", false));
                 }
             }
-            var v = new { Message = "Something went wrong" };
-            return BadRequest(v);
+            return BadRequest(CustomResponse.CustResponse("Something went wrong.", false));
         }
 
     }

@@ -35,7 +35,7 @@ namespace medical_project.Controllers
         public async Task<ActionResult<IEnumerable<BloodRequestDto>>> GetBloodRequests()
         {
             var result = await _bloodRepo.GetBloodRequestsWithExpiry(false);
-            return Ok(result);
+            return Ok(CustomResponse.CustResponse(result, true));
             /*return Ok(result.ProjectTo<BloodRequestDto>(_mapper.ConfigurationProvider));*/
         }
         [HttpGet("{id}")]
@@ -43,7 +43,7 @@ namespace medical_project.Controllers
         public async Task<ActionResult<BloodRequestDto>> GetBloodRequestById(int id)
         {
             var result = await _bloodRepo.GetBloodRequestById(id);
-            return Ok(result);
+            return Ok(CustomResponse.CustResponse(result, true));
         }
         [HttpPost("req-new")]
         [Authorize(Policy = "Normal")]
@@ -68,14 +68,14 @@ namespace medical_project.Controllers
                 _context.BloodRequest.Add(bloodrq);
                 if (await _bloodRepo.SaveAllAsync())
                 {
-                    return Ok("Requested Successfully");
+                    return Ok(CustomResponse.CustResponse("Blood request has been posted successfully.", true));
                 }
                 else
                 {
-                    return BadRequest("Something went wrong while saving the request");
+                    return BadRequest(CustomResponse.CustResponse("Something went wrong while saving your request", false));
                 }
             }
-            return BadRequest("User with userID doesnot exists");
+            return BadRequest(CustomResponse.CustResponse("Can not verify the user. Please logout and relogin if the issue persists", false));
         }
         [HttpDelete("delete-req")]
         [Authorize]
@@ -92,17 +92,15 @@ namespace medical_project.Controllers
                     _context.BloodRequest.Remove(await _bloodRepo.GetBloodRequestById(deleteRequestDto.ReqId));
                     if (await _bloodRepo.SaveAllAsync())
                     {
-                        return Ok("The Request was deleted successfully");
+                        return Ok(CustomResponse.CustResponse("The request was deleted successfuly", true));
                     }
                 }
                 else
                 {
-                    return Ok("The password is not correct");
+                    return BadRequest(CustomResponse.CustResponse("Incorrect Password", true));
                 }
             }
-            return BadRequest("There was no matching user");
-
-            
+            return BadRequest(CustomResponse.CustResponse("Can not verify the user. Please logout and relogin if the issue persists", false));
         }
         [HttpPost("donating")]
         public async Task<ActionResult> Donating(UserDonatingBloodDto donatingDto)
@@ -112,19 +110,19 @@ namespace medical_project.Controllers
             var BloodPost = await _bloodRepo.GetBloodRequestById(donatingDto.BloodRequestId);
             if (BloodPost == null)
             {
-                return BadRequest("Invalid blood request");
+                return BadRequest(CustomResponse.CustResponse("The Request to which you are trying to donate is not valid. Please re-check the request", false));
             }
             if (await _bloodRepo.UsersAlreadyGoing(userId, donatingDto.BloodRequestId))
             {
-                return BadRequest("The User is already going");
+                return BadRequest(CustomResponse.CustResponse("You are already donating your blood for this request.", false));
             }
             if (donatingDto.MLDonating > 470)
             {
-                return BadRequest("A average human can only donate upto 470ML");
+                return BadRequest(CustomResponse.CustResponse("A average human being can only donate upto 470ml.", false));
             }
             if (BloodPost.RequiredML < BloodPost.ReceivedML + donatingDto.MLDonating)
             {
-                return BadRequest("Exceeding amount detected");
+                return BadRequest(CustomResponse.CustResponse("Exceeding amount detected.", false));
             }
             if (await _bloodRepo.GetBloodRequestById(donatingDto.BloodRequestId) != null)
             {
@@ -144,16 +142,16 @@ namespace medical_project.Controllers
                     BloodPost.ReceivedML = BloodPost.ReceivedML + donatingDto.MLDonating;
                     if (await _context.SaveChangesAsync() > 0)
                     {
-                        return Ok("Everything went well");
+                        return BadRequest(CustomResponse.CustResponse($"You are donating {donatingDto.MLDonating}ml. Thank you for your blood donation.", true));
                     }
                     else
                     {
                         _context.UsersDonating.Remove(going);
-                        return BadRequest("Something went wrongg");
+                        return BadRequest(CustomResponse.CustResponse("Something went wrong.", false));
                     }
                 }
             }
-            return BadRequest("Nothing worked");
+            return BadRequest(CustomResponse.CustResponse("Something went wrong.", false));
 
         }
         [HttpPut("donating")]
@@ -165,27 +163,27 @@ namespace medical_project.Controllers
             var RequestBeingEdited = await _bloodRepo.UserDonatingBlood(userId, donatingDto.BloodRequestId);
             if (BloodPost == null)
             {
-                return BadRequest("Invalid blood request");
+                return BadRequest(CustomResponse.CustResponse("The Request to which you are trying to donate is not valid. Please re-check the request", false));
             }
             if (!await _bloodRepo.UsersAlreadyGoing(userId, donatingDto.BloodRequestId))
             {
-                return BadRequest("The User is not going");
+                return BadRequest(CustomResponse.CustResponse("You are not donating your blood for this request.", false));
             }
             if (donatingDto.MLDonating > 470)
             {
-                return BadRequest("A average human can only donate upto 470ML");
+                return BadRequest(CustomResponse.CustResponse("A average human being can only donate upto 470ml.", false));
             }
             if (BloodPost.RequiredML < BloodPost.ReceivedML + donatingDto.MLDonating)
             {
-                return BadRequest("Exceeding amount detected");
+                return BadRequest(CustomResponse.CustResponse("Exceeding amount detected.", false));
             }
 
             RequestBeingEdited.MLDonating = donatingDto.MLDonating;
             if (await _bloodRepo.SaveAllAsync())
             {
-                return Ok("Edited Sucessfully");
+                return Ok(CustomResponse.CustResponse("The record has been updated successfully.", true));
             }
-            return BadRequest("Something went wrong");
+            return BadRequest(CustomResponse.CustResponse("Something went wrong.", false));
         }
         [HttpDelete("donating/{id}")]
         public async Task<IActionResult> UndoDonation(int id)
@@ -197,19 +195,19 @@ namespace medical_project.Controllers
 
             if (BloodPost == null)
             {
-               return NotFound("Request Not Found");
+                return BadRequest(CustomResponse.CustResponse("The Request to which you are trying to perform action on is not valid. Please re-check the request", false));
             }
             if (RequestBeingEdited == null)
             {
-                return BadRequest("You are not donating.");
+                return BadRequest(CustomResponse.CustResponse("You are already not donating for this request.", false));
             }
             _context.UsersDonating.Remove(RequestBeingEdited);
             if (await _bloodRepo.SaveAllAsync())
             {
-                return BadRequest("You are not donating anymore.");
+                return Ok(CustomResponse.CustResponse("You are not donating anymore.", false));
             }
-            return BadRequest("Something went wrong while processing you request");
-            
+            return BadRequest(CustomResponse.CustResponse("Something went wrong while processing your request.", false));
+
 
 
         }

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
+
 namespace medical_project.Controllers
 {
     [Route("api/[controller]")]
@@ -30,36 +31,38 @@ namespace medical_project.Controllers
         
         [HttpPost]
         [Authorize]
-        public async Task<ActionResult> PostOrder(SomeDto dto)
-        {
+        public async Task<ActionResult> PostOrder(OrderDto dto)
+     {
             var username = User.GetUsername();
             var userId = Int32.Parse(username);
             var finalOrder = new Order
             {
                 AppUserId = userId,
-                TotalPrice = dto.TotalPrice
+                TotalPrice = dto.TotalPrice,
+                PayStatus = "Not Paid",
+                PayType = "Cash on Delivery",
+                OrderStatus = "Processing",
             };
             await _context.Order.AddAsync(finalOrder);
             if (await _context.SaveChangesAsync() > 0)
             {
-                var something = new OrderProducts
-                {
-                    OrderId = finalOrder.OrderId,
-                    ProductId = dto.ProductId,
-                    PaymentStatus = "Not Paid",
-                    PaymentType = "Cash on Delivery",
-                    Status = "Processing",
-                    Quantity = dto.Quantity
-                };
-                await _context.OrderProducts.AddAsync(something);
+                foreach (var data in dto.product){
+                    var newOrder = new OrderProducts
+                    {
+                        OrderId = finalOrder.OrderId,
+                        ProductId = data.product_id,
+                        Quantity = data.quantity
+                    };
+                    await _context.OrderProducts.AddAsync(newOrder);
+                }
                 if (await _context.SaveChangesAsync() > 0)
                 {
-                    return Ok("Everything went well");
+                    return Ok(CustomResponse.CustResponse("New Orders have been places", true));
                 }
-                return BadRequest("Something went wrong");
+                return BadRequest(CustomResponse.CustResponse("Something went wrong", false));
                 
             }
-            return BadRequest("Something went wrong");
+            return BadRequest(CustomResponse.CustResponse("Something went wrong", false));
 
         }
 
@@ -159,7 +162,6 @@ namespace medical_project.Controllers
             return Ok(orders);
         }
 */
-
 
 
     }

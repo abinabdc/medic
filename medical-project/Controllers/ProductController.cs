@@ -39,19 +39,19 @@ namespace medical_project.Controllers
             var userPharmacy = await _pharmacyRepo.GetPharmacyByUserId(userId);
             if (userPharmacy == null)
             {
-                var msg = new { Message = "Pharmacy doesnot exists" };
-                return BadRequest(msg);
+                return BadRequest(CustomResponse.CustResponse("The pharmacy, you are trying to post from doest not exists", false));
             }
             var result = await _productRepository.GetProductByStoreId(userPharmacy.Id);
-            return Ok(result);
+            return Ok(CustomResponse.CustResponse(result, true));
         }
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ProductDto>>> GetAllProducts()
         {
             var result = await _productRepository.GetAllProductAsync();
-            return Ok(result);
+            return Ok(CustomResponse.CustResponse(result, true));
         }
         [HttpPost]
+        [Authorize]
         public async Task<ActionResult> AddProduct(ProductDto dto)
         {
             var username = User.GetUsername();
@@ -60,14 +60,12 @@ namespace medical_project.Controllers
             var userPharmacy = await _pharmacyRepo.GetPharmacyByUserId(userId);
             if (userPharmacy == null)
             {
-                var msg = new { Message = "User doesnot have registered his pharmacy" };
-                return BadRequest(msg);
+                return BadRequest(CustomResponse.CustResponse("You do not have any pharmacy registered", false));
             }
 
             if (await _productRepository.ProductExists(dto.Name))
             {
-                var err = new { Message = "Product with the name already exists." };
-                return BadRequest(err);
+                return BadRequest(CustomResponse.CustResponse("Product with the same name already exists.", false));
             }
             else
             {
@@ -83,14 +81,11 @@ namespace medical_project.Controllers
                 await _context.Product.AddAsync(newProduct);
                 if (await _productRepository.SaveAllAsync())
                 {
-                    /*var msgg = new { Message = "Product has been posted successfully" };*/
-                    return Ok();
-
+                    return Ok(CustomResponse.CustResponse("The Product has been posted successfully", true));
                 }
                 else
                 {
-                    var error = new { Message = "Something went wrong" };
-                    return BadRequest(error);
+                    return BadRequest(CustomResponse.CustResponse("Something went wrong.", false));
                 }
             }
 
