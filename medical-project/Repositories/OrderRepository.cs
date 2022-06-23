@@ -17,50 +17,56 @@ namespace medical_project.Repositories
             _mapper = mapper;
 
         }
-        /*public async Task<IEnumerable<OrderDto>> GetAllAsync()
-        {
-            return await _context.Order.ProjectTo<OrderDto>(_mapper.ConfigurationProvider).ToListAsync();
-        }*/
 
-/*        public async Task<IEnumerable<OrderDto>> GetAllByPharmacyIdAsync(int Id)
+        public async Task<IEnumerable<ResponseOrderDto>> GetAllByUserIdAsync(int userId)
         {
-            return await _context.Order.Include(o => o.Product).Where(p => p.Product.PharmacyId == Id).ProjectTo<OrderDto>(_mapper.ConfigurationProvider).ToListAsync();
-            *//*return await _context.Order.Include(o => o.Product).Where(p => p.Product.PharmacyId == Id).ProjectTo<OrderDto>(_mapper.ConfigurationProvider).ToListAsync();*//*
-        }*/
-
-       /* public async Task<IEnumerable<OrderDto>> GetAllByUserId(int Id)
-        {
-            return await _context.Order.Where(p => p.AppUserId == Id).ProjectTo<OrderDto>(_mapper.ConfigurationProvider).ToListAsync();
-        }*/
-
-/*        public async Task<IEnumerable<OrderDto>> GetCompletedByPharmacy(int Id)
-        {
-            return await _context.Order.Include(o => o.Product).Where(p => p.Product.PharmacyId == Id && p.Status == "Delivered").ProjectTo<OrderDto>(_mapper.ConfigurationProvider).ToListAsync();
+            return await _context.Order.Where(p => p.AppUserId == userId).ProjectTo<ResponseOrderDto>(_mapper.ConfigurationProvider).ToListAsync();
         }
 
-        public async Task<IEnumerable<OrderDto>> GetCompletedByUserId(int Id)
+        public async Task<IEnumerable<ResponseOrderDto>> GetAllCompletedOrdersAsync()
         {
-            return await _context.Order.Include(o => o.Product).Where(p => p.AppUserId == Id && p.Status == "Delivered").ProjectTo<OrderDto>(_mapper.ConfigurationProvider).ToListAsync();
+            return await _context.Order.Where(p => p.OrderStatus == "Delivered").ProjectTo<ResponseOrderDto>(_mapper.ConfigurationProvider).ToListAsync();
         }
 
-        public async Task<IEnumerable<OrderDto>> GetPendingByPharmacyIdAsync(int Id)
+        public async Task<IEnumerable<ResponseOrderDto>> GetAllOrders()
         {
-           return await _context.Order.Include(o => o.Product).Where(p => p.Product.PharmacyId == Id && p.Status != "Delivered").ProjectTo<OrderDto>(_mapper.ConfigurationProvider).ToListAsync();
+            return await _context.Order.ProjectTo<ResponseOrderDto>(_mapper.ConfigurationProvider).ToListAsync();
         }
 
-        public async Task<IEnumerable<OrderDto>> GetPendingByUserId(int userId)
+        public async Task<IEnumerable<ResponseOrderDto>> GetAllPendingOrdersAsync()
         {
-            return await _context.Order.Include(o => o.Product).Where(p => p.AppUserId == userId && p.Status != "Delivered").ProjectTo<OrderDto>(_mapper.ConfigurationProvider).ToListAsync();
-        }*/
+            return await _context.Order.Where(p => p.OrderStatus != "Delivered").ProjectTo<ResponseOrderDto>(_mapper.ConfigurationProvider).ToListAsync();
+        }
+
+        public async Task<IEnumerable<ResponseOrderDto>> GetCompleByUserIdAsync(int userId)
+        {
+            return await _context.Order.Where(p => p.AppUserId == userId && p.OrderStatus == "Delivered").ProjectTo<ResponseOrderDto>(_mapper.ConfigurationProvider).ToListAsync();
+        }
+
+        public async Task<ResponseOrderDto> GetOrderById(int id)
+        {
+            return await _context.Order.Where(p => p.OrderId == id).ProjectTo<ResponseOrderDto>(_mapper.ConfigurationProvider).FirstOrDefaultAsync();
+        }
+
+        public async Task<Order> GetOrderByIdInternalUse(int id)
+        {
+            return await _context.Order.Where(p => p.OrderId == id).FirstOrDefaultAsync();
+        }
+
+        public async Task<IEnumerable<ResponseOrderDto>> GetPendingByUserIdAsync(int userId)
+        {
+            return await _context.Order.Where(p => p.AppUserId == userId && p.OrderStatus != "Delivered").ProjectTo<ResponseOrderDto>(_mapper.ConfigurationProvider).ToListAsync();
+        }
 
         public async Task<bool> SaveAllAsync()
         {
             return await _context.SaveChangesAsync() > 0;
         }
 
-        public void Update(OrderDto order)
+        public void Update(Order order)
         {
             _context.Entry(order).State = EntityState.Modified;
         }
+
     }
 }

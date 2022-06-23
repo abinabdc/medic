@@ -15,6 +15,8 @@ namespace medical_project.Helpers
             CreateMap<Pharmacy, PharmacyDto>();
             CreateMap<Product, ProductDto>();
             CreateMap<Order, OrderDto>();
+            CreateMap<OrderProducts, OrderProductDto>();
+            CreateMap<Order, ResponseOrderDto>();
         }
     }
 }

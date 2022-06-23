@@ -30,6 +30,7 @@ namespace medical_project
             services.AddScoped<IPharmacyRepository, PharmacyRepository>();
             services.AddScoped<IProductRepository, ProductRepository>();
             services.AddScoped<IOrderRepository, OrderRepository>();
+            services.AddScoped<IOrderProductsRepository, OrderProductsRepository>();
             services.AddDbContext<DataContext>(options =>
             {
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
@@ -64,6 +65,7 @@ namespace medical_project
             {
                 opt.AddPolicy("Normal", policy => policy.RequireRole("Normal", "Vendor", "Admin"));
                 opt.AddPolicy("Manager", policy => policy.RequireRole("Vendor, Admin"));
+                opt.AddPolicy("VendorOnly", policy => policy.RequireRole("Vendor"));
                 opt.AddPolicy("Admin", policy => policy.RequireRole("Admin"));
 
             });
